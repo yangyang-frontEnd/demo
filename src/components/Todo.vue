@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { createNamespacedHelpers } from "vuex";
+import { createNamespacedHelpers, mapGetters, mapActions } from "vuex";
 const todo = createNamespacedHelpers("Todo");
 
 export default {
@@ -61,32 +61,56 @@ export default {
     };
   },
   computed: {
-    ...todo.mapGetters(["getTodo", "completedTodos", "unCompletedTodos"]),
+    // ...todo.mapGetters(["getTodo", "completedTodos", "unCompletedTodos"]),
+    // ...mapGetters("Todo", ["getTodo", "completedTodos", "unCompletedTodos"]),
+    ...mapGetters("Todo", {
+      g: "getTodo",
+      c: "completedTodos",
+      u: "unCompletedTodos",
+    }),
+    /*     g() {
+      return this.$store.getters["Todo/getTodo"];
+    },
+    c() {
+      return this.$store.getters["Todo/completedTodos"];
+    },
+    u() {
+      return this.$store.getters["Todo/unCompletedTodos"];
+    }, */
   },
   created() {
     // console.log("请求服务器数据并完成初始化操作");
-    this.initTodos();
+    // this.i();
+    this.$store.dispatch("Todo/initTodos");
   },
   methods: {
-    ...todo.mapActions(["initTodos", "toggle", "addTodo", "deleteTodo"]),
+    // ...todo.mapActions(["initTodos", "toggle", "addTodo", "deleteTodo"]),
+    // ...mapActions("Todo", ["initTodos", "toggle", "addTodo", "deleteTodo"]),
+    ...mapActions("Todo", {
+      i: "initTodos",
+      t: "toggle",
+      a: "addTodo",
+      d: "deleteTodo",
+    }),
     getTodos() {
       if (this.flag == 1) {
-        return this.getTodo;
+        return this.g;
       }
       if (this.flag == 2) {
-        return this.completedTodos;
+        return this.c;
       }
       if (this.flag == 3) {
-        return this.unCompletedTodos;
+        return this.u;
       }
     },
     handleSelect(e) {
       // console.dir(e.target.value);
       this.size = e.target.value;
-      this.initTodos(this.size);
+      this.i(this.size);
     },
     handleToggle(todo) {
-      this.toggle(todo);
+      // this.t(todo);
+      this.$store.dispatch("Todo/toggle", todo);
     },
     handleSubmit(e) {
       // console.log(this.title);
@@ -94,11 +118,13 @@ export default {
         alert("请输入点内容吧");
         return;
       }
-      this.addTodo(this.title);
+      // this.a(this.title);
+      this.$store.dispatch("Todo/addTodo", this.title);
       this.title = "";
     },
     handleDelect(todo, index) {
-      this.deleteTodo({ todo, index });
+      // this.d({ todo, index });
+      this.$store.dispatch("Todo/deleteTodo", { todo, index });
     },
   },
 };
